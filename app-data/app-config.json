@@ -1,0 +1,137 @@
+{
+  "appId": "example-app",
+  "appName": "Example App",
+  "tagline": "A smarter iPhone app for everyday life.",
+  "heroHeadline": "The smarter way to manage your day.",
+  "heroSubheadline": "A beautiful iOS-style app experience built for real users and fast validation.",
+  "badgeText": "Coming soon to the App Store",
+  "primaryCtaText": "Get Early Access",
+  "secondaryCtaText": "See it in action",
+  "theme": {
+    "style": "liquid-glass",
+    "accentColor": "violet",
+    "mode": "light"
+  },
+  "logo": {
+    "text": "A",
+    "imageUrl": ""
+  },
+  "mockup": {
+    "embedUrl": "https://example-mockup-url.vercel.app",
+    "baseWidth": 375,
+    "baseHeight": 820,
+    "useOuterDeviceFrame": false
+  },
+  "problem": "Most apps are bloated, confusing, and hard to stick with.",
+  "solution": "Example App gives users a simple, focused, and beautiful way to get the result they want.",
+  "targetAudience": "iPhone users who want a better daily experience.",
+  "benefits": [
+    {
+      "title": "Built for iPhone",
+      "description": "Designed around a clean, native-feeling mobile experience.",
+      "icon": "phone"
+    },
+    {
+      "title": "Simple to Use",
+      "description": "Clear, focused, and easy to understand immediately.",
+      "icon": "sparkles"
+    },
+    {
+      "title": "Made for Real Life",
+      "description": "Built around the way people actually use apps every day.",
+      "icon": "check"
+    }
+  ],
+  "features": [
+    {
+      "title": "Fast Setup",
+      "description": "Users can get started quickly without confusion."
+    },
+    {
+      "title": "Beautiful Progress",
+      "description": "A clean interface makes the value obvious."
+    },
+    {
+      "title": "Smart Reminders",
+      "description": "Helpful prompts keep users engaged."
+    }
+  ],
+  "screenshots": [
+    {
+      "title": "Plan your day",
+      "description": "Organize tasks and priorities in one place.",
+      "image": "/app-data/images/1.png"
+    },
+    {
+      "title": "Track your progress",
+      "description": "See progress and build better habits.",
+      "image": "/app-data/images/2.png"
+    },
+    {
+      "title": "Stay focused",
+      "description": "Block distractions and get things done.",
+      "image": "/app-data/images/3.png"
+    },
+    {
+      "title": "Reflect and improve",
+      "description": "End your day with insights that help you grow.",
+      "image": "/app-data/images/4.png"
+    }
+  ],
+  "howItWorks": {
+    "enabled": true,
+    "steps": [
+      {
+        "title": "Try the live preview",
+        "description": "Explore the app experience directly on the page."
+      },
+      {
+        "title": "Enter your email",
+        "description": "Join the early access list."
+      },
+      {
+        "title": "Reserve access",
+        "description": "Click the purchase-intent button to validate demand."
+      }
+    ]
+  },
+  "pricing": {
+    "enabled": true,
+    "price": "$4.99",
+    "billingLabel": "early access",
+    "ctaText": "Buy Now on App Store",
+    "finePrint": "You will be notified when this app is available."
+  },
+  "emailCapture": {
+    "enabled": true,
+    "headline": "Want launch updates?",
+    "subheadline": "Join the waitlist and be the first to know.",
+    "placeholder": "Enter your email",
+    "buttonText": "Notify Me"
+  },
+  "faq": {
+    "enabled": true,
+    "items": [
+      {
+        "question": "Is this available now?",
+        "answer": "This app is currently being validated before launch."
+      },
+      {
+        "question": "Will I be charged today?",
+        "answer": "No. This page measures purchase intent and collects early access interest."
+      },
+      {
+        "question": "What happens after I enter my email?",
+        "answer": "You will be notified when the app becomes available."
+      }
+    ]
+  },
+  "testimonials": {
+    "enabled": false,
+    "items": []
+  },
+  "tracking": {
+    "buyNowWebhookUrl": "",
+    "emailWebhookUrl": ""
+  }
+}

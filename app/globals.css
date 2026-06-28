@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply antialiased;
+    color: var(--foreground);
+    background: var(--page-bg);
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+}
+
+@layer components {
+  .section-container {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8;
+  }
+
+  .section-padding {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  .glass-panel {
+    background: var(--surface);
+    backdrop-filter: blur(var(--glass-blur, 12px));
+    -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
+    border: 1px solid var(--glass-border, var(--border));
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  }
+
+  .glass-card {
+    @apply glass-panel rounded-2xl p-6 sm:p-8;
+  }
+
+  .gradient-bg {
+    background: var(--page-bg);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition-all duration-200;
+    background: var(--accent-gradient);
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px var(--accent-glow);
+  }
+
+  .btn-primary:disabled {
+    @apply cursor-not-allowed opacity-50;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full border px-6 py-3 text-sm font-semibold transition-all duration-200;
+    color: var(--foreground);
+    border-color: var(--border);
+    background: var(--surface-elevated);
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  }
+
+  .section-heading {
+    @apply text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl;
+    color: var(--foreground);
+  }
+
+  .section-subheading {
+    @apply mt-4 max-w-2xl text-base sm:text-lg;
+    color: var(--muted);
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+
+  .input-field {
+    @apply w-full rounded-xl border px-4 py-3 text-sm outline-none transition-colors;
+    background: var(--surface-elevated);
+    border-color: var(--border);
+    color: var(--foreground);
+  }
+
+  .input-field::placeholder {
+    color: var(--muted);
+  }
+
+  .input-field:focus {
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+}
