@@ -16,6 +16,8 @@ export interface MockupConfig {
   baseWidth: number;
   baseHeight: number;
   useOuterDeviceFrame: boolean;
+  /** Pixels clipped from the iframe bottom to hide mockup dev/debug chrome */
+  clipBottomPx?: number;
 }
 
 export interface Benefit {
@@ -33,6 +35,10 @@ export interface Screenshot {
   title: string;
   description: string;
   image: string;
+  /** App Package path, e.g. media/screenshots/01-home.png — shown when image is missing */
+  sourcePath?: string;
+  /** Set by generate-app-config when the PNG is not present in the App Package */
+  missing?: boolean;
 }
 
 export interface HowItWorksStep {
@@ -47,6 +53,7 @@ export interface HowItWorksConfig {
 
 export interface PricingConfig {
   enabled: boolean;
+  headlineLabel: string;
   price: string;
   billingLabel: string;
   ctaText: string;
@@ -87,12 +94,24 @@ export interface TrackingConfig {
   emailWebhookUrl: string;
 }
 
+export interface SeoConfig {
+  title: string;
+  description: string;
+  keywords: string[];
+  ogImageUrl: string;
+}
+
+export interface FooterConfig {
+  text: string;
+}
+
 export interface AppConfig {
   appId: string;
   appName: string;
   tagline: string;
   heroHeadline: string;
   heroSubheadline: string;
+  heroBody: string;
   badgeText: string;
   primaryCtaText: string;
   secondaryCtaText: string;
@@ -110,6 +129,8 @@ export interface AppConfig {
   emailCapture: EmailCaptureConfig;
   faq: FAQConfig;
   testimonials: TestimonialsConfig;
+  seo: SeoConfig;
+  footer: FooterConfig;
   tracking: TrackingConfig;
 }
 
@@ -119,8 +140,9 @@ const defaults: AppConfig = {
   tagline: "",
   heroHeadline: "",
   heroSubheadline: "",
+  heroBody: "",
   badgeText: "",
-  primaryCtaText: "Get Early Access",
+  primaryCtaText: "Get It Now",
   secondaryCtaText: "Learn More",
   theme: { style: "liquid-glass", accentColor: "violet", mode: "light" },
   logo: { text: "A", imageUrl: "" },
@@ -129,6 +151,7 @@ const defaults: AppConfig = {
     baseWidth: 375,
     baseHeight: 820,
     useOuterDeviceFrame: false,
+    clipBottomPx: 0,
   },
   problem: "",
   solution: "",
@@ -139,9 +162,10 @@ const defaults: AppConfig = {
   howItWorks: { enabled: false, steps: [] },
   pricing: {
     enabled: false,
+    headlineLabel: "Get for",
     price: "",
     billingLabel: "",
-    ctaText: "Buy Now",
+    ctaText: "Buy it now on the App Store",
     finePrint: "",
   },
   emailCapture: {
@@ -153,6 +177,8 @@ const defaults: AppConfig = {
   },
   faq: { enabled: false, items: [] },
   testimonials: { enabled: false, items: [] },
+  seo: { title: "", description: "", keywords: [], ogImageUrl: "" },
+  footer: { text: "" },
   tracking: { buyNowWebhookUrl: "", emailWebhookUrl: "" },
 };
 
@@ -168,6 +194,8 @@ function mergeConfig(partial: Partial<AppConfig>): AppConfig {
     emailCapture: { ...defaults.emailCapture, ...partial.emailCapture },
     faq: { ...defaults.faq, ...partial.faq },
     testimonials: { ...defaults.testimonials, ...partial.testimonials },
+    seo: { ...defaults.seo, ...partial.seo },
+    footer: { ...defaults.footer, ...partial.footer },
     tracking: { ...defaults.tracking, ...partial.tracking },
     benefits: partial.benefits ?? defaults.benefits,
     features: partial.features ?? defaults.features,
@@ -201,4 +229,14 @@ export function getSafeTestimonials(config: AppConfig): TestimonialItem[] {
 
 export function getSafeHowItWorksSteps(config: AppConfig): HowItWorksStep[] {
   return (config.howItWorks?.steps ?? []).filter((s) => s?.title);
+}
+
+/** Build pricing CTA label from config — supports `{price}` template tokens */
+export function getPricingCtaText(pricing: PricingConfig): string {
+  const base = pricing.ctaText?.trim() || "Buy Now";
+  if (!pricing.price) return base;
+  if (base.includes("{price}")) {
+    return base.replace(/\{price\}/g, pricing.price);
+  }
+  return base;
 }

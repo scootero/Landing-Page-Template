@@ -14,6 +14,15 @@
     min-height: 100vh;
   }
 
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--foreground);
+  }
+
   ::selection {
     background: color-mix(in srgb, var(--accent) 25%, transparent);
   }
@@ -28,6 +37,14 @@
     @apply py-16 sm:py-20 lg:py-24;
   }
 
+  .text-theme {
+    color: var(--foreground);
+  }
+
+  .text-theme-muted {
+    color: var(--muted);
+  }
+
   .glass-panel {
     background: var(--surface);
     backdrop-filter: blur(var(--glass-blur, 12px));
@@ -36,12 +53,84 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
   }
 
+  [data-mode="dark"] .glass-panel {
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
   .glass-card {
     @apply glass-panel rounded-2xl p-6 sm:p-8;
   }
 
   .gradient-bg {
     background: var(--page-bg);
+    color: var(--foreground);
+  }
+
+  .premium-bg {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .premium-bg__glow {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .premium-bg__orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.55;
+    will-change: transform;
+  }
+
+  .premium-bg__orb--primary {
+    width: min(55vw, 520px);
+    height: min(55vw, 520px);
+    top: -12%;
+    right: -8%;
+    background: var(--glow-1, var(--accent-glow));
+  }
+
+  .premium-bg__orb--secondary {
+    width: min(45vw, 420px);
+    height: min(45vw, 420px);
+    bottom: 8%;
+    left: -10%;
+    background: var(--glow-2, var(--accent-glow));
+    opacity: 0.4;
+  }
+
+  .premium-bg__orb--center {
+    width: min(35vw, 320px);
+    height: min(35vw, 320px);
+    top: 42%;
+    left: 38%;
+    transform: translate(-50%, -50%);
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    opacity: 0.25;
+    filter: blur(100px);
+  }
+
+  .premium-bg__noise {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: var(--noise-opacity, 0.04);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 128px 128px;
+  }
+
+  .premium-bg__content {
+    position: relative;
+    z-index: 1;
   }
 
   .btn-primary {

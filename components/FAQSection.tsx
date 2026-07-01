@@ -47,7 +47,7 @@ export default function FAQSection({ items }: FAQSectionProps) {
                   className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
                   aria-expanded={isOpen}
                 >
-                  <span className="font-medium">{item.question}</span>
+                  <span className="font-medium text-theme">{item.question}</span>
                   <ChevronDown
                     className={`h-5 w-5 shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
                     style={{ color: "var(--muted)" }}

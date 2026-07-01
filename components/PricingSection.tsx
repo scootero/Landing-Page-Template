@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import type { Benefit, Feature, PricingConfig } from "@/lib/appData";
+import { getPricingCtaText } from "@/lib/appData";
 import BuyNowTracker from "./BuyNowTracker";
 
 interface PricingSectionProps {
@@ -40,12 +41,12 @@ export default function PricingSection({
         >
           <div className="glass-card text-center">
             <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
-              Early Access
+              {pricing.headlineLabel || "Get for"}
             </p>
 
             {pricing.price && (
               <div className="mt-4 flex items-baseline justify-center gap-2">
-                <span className="text-5xl font-semibold tracking-tight">{pricing.price}</span>
+                <span className="text-5xl font-semibold tracking-tight text-theme">{pricing.price}</span>
                 {pricing.billingLabel && (
                   <span className="text-sm" style={{ color: "var(--muted)" }}>
                     / {pricing.billingLabel}
@@ -57,7 +58,7 @@ export default function PricingSection({
             {valueBullets.length > 0 && (
               <ul className="mt-8 space-y-3 text-left">
                 {valueBullets.map((bullet) => (
-                  <li key={bullet} className="flex items-center gap-3 text-sm">
+                  <li key={bullet} className="flex items-center gap-3 text-sm text-theme">
                     <span
                       className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
                       style={{
@@ -78,7 +79,7 @@ export default function PricingSection({
                 appId={appId}
                 appName={appName}
                 price={pricing.price}
-                ctaText={pricing.ctaText}
+                ctaText={getPricingCtaText(pricing)}
                 webhookUrl={webhookUrl}
               />
             </div>

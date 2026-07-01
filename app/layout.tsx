@@ -18,9 +18,19 @@ const geistMono = Geist_Mono({
 const config = getAppConfig();
 const resolvedTheme = resolveTheme(config.theme);
 
+const pageTitle = config.seo.title || config.appName;
+const pageDescription =
+  config.seo.description || config.tagline || config.heroSubheadline;
+
 export const metadata: Metadata = {
-  title: config.appName,
-  description: config.tagline || config.heroSubheadline,
+  title: pageTitle,
+  description: pageDescription,
+  keywords: config.seo.keywords.length ? config.seo.keywords : undefined,
+  openGraph: {
+    title: pageTitle,
+    description: pageDescription,
+    images: config.seo.ogImageUrl ? [config.seo.ogImageUrl] : undefined,
+  },
 };
 
 export default function RootLayout({
@@ -29,7 +39,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      data-theme={resolvedTheme.style}
+      data-mode={resolvedTheme.mode}
+      style={resolvedTheme.cssVars as React.CSSProperties}
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >

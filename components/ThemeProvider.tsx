@@ -17,15 +17,27 @@ interface ThemeProviderProps {
 }
 
 export default function ThemeProvider({ theme, children }: ThemeProviderProps) {
+  const showPremiumBg = theme.mode === "dark";
+
   return (
     <ThemeContext.Provider value={theme}>
       <div
         data-theme={theme.style}
         data-mode={theme.mode}
-        className="gradient-bg min-h-screen"
+        className="gradient-bg premium-bg min-h-screen"
         style={theme.cssVars as React.CSSProperties}
       >
-        {children}
+        {showPremiumBg && (
+          <>
+            <div className="premium-bg__glow" aria-hidden="true">
+              <div className="premium-bg__orb premium-bg__orb--primary" />
+              <div className="premium-bg__orb premium-bg__orb--secondary" />
+              <div className="premium-bg__orb premium-bg__orb--center" />
+            </div>
+            <div className="premium-bg__noise" aria-hidden="true" />
+          </>
+        )}
+        <div className="premium-bg__content">{children}</div>
       </div>
     </ThemeContext.Provider>
   );

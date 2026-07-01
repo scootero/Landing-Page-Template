@@ -64,7 +64,7 @@ export default function EmailCapture({
           className="glass-card mx-auto max-w-2xl text-center"
         >
           {config.headline && (
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h2 className="text-2xl font-semibold tracking-tight text-theme sm:text-3xl">
               {config.headline}
             </h2>
           )}

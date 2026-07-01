@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { AppConfig } from "@/lib/appData";
+import { StoreCtaLink } from "./StoreCta";
 
 interface HeaderProps {
   config: AppConfig;
@@ -37,7 +38,7 @@ export default function Header({ config }: HeaderProps) {
               {logo.text || appName.charAt(0)}
             </span>
           )}
-          <span className="text-sm font-semibold tracking-tight sm:text-base">
+          <span className="text-sm font-semibold tracking-tight text-theme sm:text-base">
             {appName}
           </span>
         </a>
@@ -55,9 +56,9 @@ export default function Header({ config }: HeaderProps) {
           ))}
         </nav>
 
-        <a href="#pricing" className="btn-primary shrink-0 px-4 py-2 text-xs sm:px-5 sm:text-sm">
+        <StoreCtaLink href="#pricing" className="shrink-0 px-4 py-2 text-xs sm:px-5 sm:text-sm">
           {primaryCtaText}
-        </a>
+        </StoreCtaLink>
       </div>
     </header>
   );

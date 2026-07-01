@@ -30,7 +30,7 @@ export default function ProblemSolution({
               <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
                 The Problem
               </p>
-              <p className="mt-4 text-lg leading-relaxed sm:text-xl">{problem}</p>
+              <p className="mt-4 text-lg leading-relaxed text-theme sm:text-xl">{problem}</p>
             </motion.div>
           )}
 
@@ -48,7 +48,7 @@ export default function ProblemSolution({
               <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
                 The Solution
               </p>
-              <p className="mt-4 text-lg leading-relaxed sm:text-xl">{solution}</p>
+              <p className="mt-4 text-lg leading-relaxed text-theme sm:text-xl">{solution}</p>
             </motion.div>
           )}
         </div>

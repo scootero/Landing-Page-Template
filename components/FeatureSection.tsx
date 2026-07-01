@@ -39,7 +39,7 @@ export default function FeatureSection({ features }: FeatureSectionProps) {
                 className="mb-3 h-1 w-8 rounded-full"
                 style={{ background: "var(--accent-gradient)" }}
               />
-              <h3 className="text-lg font-semibold">{feature.title}</h3>
+              <h3 className="text-lg font-semibold text-theme">{feature.title}</h3>
               {feature.description && (
                 <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
                   {feature.description}

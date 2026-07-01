@@ -12,7 +12,8 @@
     "prebuild": "node scripts/copy-app-data-images.js",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-config": "node scripts/generate-app-config.js"
   },
   "dependencies": {
     "framer-motion": "^11.18.2",

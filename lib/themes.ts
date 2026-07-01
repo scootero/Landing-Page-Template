@@ -12,7 +12,7 @@ export type ThemeStyle =
 export interface ResolvedTheme {
   style: ThemeStyle;
   accentColor: string;
-  mode: string;
+  mode: "light" | "dark";
   cssVars: Record<string, string>;
 }
 
@@ -87,12 +87,12 @@ const STYLE_BACKGROUNDS: Record<
     border: "rgba(255, 255, 255, 0.12)",
   },
   midnight: {
-    bg: "linear-gradient(160deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)",
-    surface: "rgba(30, 41, 59, 0.7)",
-    elevated: "rgba(51, 65, 85, 0.85)",
+    bg: "linear-gradient(165deg, #070b14 0%, #0f172a 28%, #131a2e 52%, #0c1220 78%, #070b14 100%)",
+    surface: "rgba(22, 30, 48, 0.72)",
+    elevated: "rgba(36, 48, 72, 0.88)",
     foreground: "#f1f5f9",
     muted: "#94a3b8",
-    border: "rgba(148, 163, 184, 0.2)",
+    border: "rgba(148, 163, 184, 0.18)",
   },
   aurora: {
     bg: "linear-gradient(135deg, #0f172a 0%, #312e81 35%, #134e4a 70%, #0f172a 100%)",
@@ -145,10 +145,12 @@ export function resolveTheme(theme: ThemeConfig): ResolvedTheme {
     theme.mode === "dark" ||
     ["apple-dark", "midnight", "aurora", "black-titanium"].includes(style);
 
+  const mode = isDark ? "dark" : "light";
+
   return {
     style,
     accentColor: accentKey,
-    mode: isDark ? "dark" : "light",
+    mode,
     cssVars: {
       "--page-bg": palette.bg,
       "--surface": palette.surface,
@@ -162,6 +164,9 @@ export function resolveTheme(theme: ThemeConfig): ResolvedTheme {
       "--accent-gradient": accent.gradient,
       "--glass-blur": style === "liquid-glass" ? "20px" : "12px",
       "--glass-border": palette.border,
+      "--glow-1": accent.glow,
+      "--glow-2": `color-mix(in srgb, ${accent.muted} 25%, transparent)`,
+      "--noise-opacity": isDark ? "0.045" : "0.025",
     },
   };
 }

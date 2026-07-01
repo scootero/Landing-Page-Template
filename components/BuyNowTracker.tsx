@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { CheckCircle2, AlertCircle } from "lucide-react";
+import { StoreCtaButton } from "./StoreCta";
 import { isValidEmail } from "@/lib/validation";
 import { createTrackingPayload, postTrackingEvent } from "@/lib/tracking";
 
@@ -86,16 +87,9 @@ export default function BuyNowTracker({
         </div>
       )}
 
-      <button type="submit" className="btn-primary w-full" disabled={!emailValid || state === "loading"}>
-        {state === "loading" ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Processing...
-          </>
-        ) : (
-          ctaText
-        )}
-      </button>
+      <StoreCtaButton loading={state === "loading"} disabled={!emailValid}>
+        {ctaText}
+      </StoreCtaButton>
     </form>
   );
 }

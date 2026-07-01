@@ -59,7 +59,7 @@ export default function BenefitGrid({ benefits }: BenefitGridProps) {
                 >
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-lg font-semibold tracking-tight">{benefit.title}</h3>
+                <h3 className="text-lg font-semibold tracking-tight text-theme">{benefit.title}</h3>
                 {benefit.description && (
                   <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
                     {benefit.description}

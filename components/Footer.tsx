@@ -17,7 +17,7 @@ export default function Footer({ config }: FooterProps) {
           >
             {config.logo.text || config.appName.charAt(0)}
           </span>
-          <span className="text-sm font-medium">{config.appName}</span>
+          <span className="text-sm font-medium text-theme">{config.appName}</span>
         </div>
 
         <nav className="flex gap-6 text-sm" style={{ color: "var(--muted)" }}>
@@ -33,7 +33,8 @@ export default function Footer({ config }: FooterProps) {
         </nav>
 
         <p className="text-xs" style={{ color: "var(--muted)" }}>
-          &copy; {year} {config.appName}. All rights reserved.
+          {config.footer.text ||
+            `\u00a9 ${year} ${config.appName}. All rights reserved.`}
         </p>
       </div>
     </footer>
