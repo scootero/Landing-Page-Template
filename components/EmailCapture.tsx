@@ -4,24 +4,18 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import type { EmailCaptureConfig } from "@/lib/appData";
+import { useTracking } from "./TrackingProvider";
 import { isValidEmail } from "@/lib/validation";
-import { createTrackingPayload, postTrackingEvent } from "@/lib/tracking";
+import { TRACKING_EVENTS } from "@/lib/tracking";
 
 interface EmailCaptureProps {
   config: EmailCaptureConfig;
-  appId: string;
-  appName: string;
-  webhookUrl: string;
 }
 
 type SubmitState = "idle" | "loading" | "success" | "error";
 
-export default function EmailCapture({
-  config,
-  appId,
-  appName,
-  webhookUrl,
-}: EmailCaptureProps) {
+export default function EmailCapture({ config }: EmailCaptureProps) {
+  const { trackEvent } = useTracking();
   const [email, setEmail] = useState("");
   const [state, setState] = useState<SubmitState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -37,14 +31,10 @@ export default function EmailCapture({
     setState("loading");
     setErrorMessage("");
 
-    const payload = createTrackingPayload({
-      eventType: "email_signup",
-      appId,
-      appName,
+    const result = await trackEvent({
+      eventType: TRACKING_EVENTS.EMAIL_CAPTURED,
       email: email.trim(),
     });
-
-    const result = await postTrackingEvent(webhookUrl, payload);
 
     if (result.ok) {
       setState("success");
@@ -103,7 +93,7 @@ export default function EmailCapture({
                 {state === "loading" ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  config.buttonText || "Notify Me"
+                  config.buttonText || "Keep Me Updated"
                 )}
               </button>
             </form>

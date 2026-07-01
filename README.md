@@ -40,7 +40,8 @@ components/
 lib/
   appData.ts          # Config types and loaders
   validation.ts       # Email validation
-  tracking.ts         # Webhook payload helpers
+  tracking.ts         # Webhook payload helpers and event types
+  TrackingProvider.tsx # Client tracking context (page_view, session metrics)
   themes.ts           # Theme system
 app-data/
   app-config.json     # All app-specific content
@@ -64,9 +65,25 @@ All app-specific content lives in `app-data/app-config.json`:
 | `theme` | Visual style (see below) |
 | `mockup.embedUrl` | Deployed mockup app URL |
 | `pricing`, `emailCapture`, `faq` | Optional sections (`enabled: true/false`) |
-| `tracking` | Webhook URLs |
+| `tracking` | Webhook URLs and experiment attribution IDs |
 
 Set `enabled: false` on optional sections to hide them. Missing arrays or strings won't crash the page.
+
+### Tracking config
+
+| Field | Purpose |
+|-------|---------|
+| `tracking.webhookUrl` | Canonical unified n8n webhook for all events |
+| `tracking.buyNowWebhookUrl` | Legacy fallback for `buy_now_clicked` |
+| `tracking.emailWebhookUrl` | Legacy fallback for `email_captured` |
+| `tracking.experimentId` | Experiment family ID for dashboard routing |
+| `tracking.experimentRunId` | Immutable run ID for one validation cycle |
+| `tracking.projectId` | Analytics project ID |
+| `tracking.landingVersion` | Landing deploy timestamp |
+| `tracking.landingVariantId` | Landing copy/layout variant |
+| `tracking.mockupVersionId` | Mockup build variant |
+| `tracking.deploymentId` | Landing Vercel project or deployment URL |
+| `tracking.campaignName` | Ad campaign name for attribution |
 
 ## Replacing Images
 
@@ -121,56 +138,54 @@ Configure in `app-config.json`:
 
 **Accent colors:** `violet`, `blue`, `emerald`, `rose`, `amber`, `cyan`
 
-## Buy Now Tracking
+## Conversion tracking
 
-The pricing section uses fake-door validation:
+The landing page sends four event types to n8n webhooks:
 
-1. User enters a valid email
-2. Buy Now button enables
-3. On click, POST to `tracking.buyNowWebhookUrl`
-4. Success message shown (no redirect to App Store)
+| eventType | When |
+|-----------|------|
+| `page_view` | Once on load |
+| `buy_now_clicked` | Pricing fake-door submit |
+| `email_captured` | Waitlist form submit |
+| `mockup_interacted` | First mockup expand/click |
 
-If no webhook URL is configured, events are logged to the console in development and success UI is still shown for local testing.
+If no webhook URL is configured, events are logged to the console in development and the UI still succeeds for local testing.
 
-## Webhook Payloads
+## Webhook payloads
 
-### Buy Now Click
+All events share the same JSON shape. n8n should append each payload as one row in a unified Google Sheet, using `eventType` to filter or pivot.
 
 ```json
 {
-  "eventType": "buy_now_click",
+  "eventType": "buy_now_clicked",
   "appId": "example-app",
   "appName": "Example App",
+  "experimentId": "exp_example-app_001",
+  "experimentRunId": "run_example-app_001",
+  "projectId": "proj_example-app",
+  "deploymentId": "prj_landing_abc123",
+  "landingVersion": "2026-06-29T12:00:00.000Z",
+  "landingVariantId": "v1",
+  "mockupVersionId": "v1",
+  "campaignName": "example-app-validation",
+  "visitorId": "550e8400-e29b-41d4-a716-446655440000",
+  "sessionId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
   "email": "user@example.com",
   "price": "$4.99",
-  "pageUrl": "https://yoursite.com/?utm_source=twitter",
-  "utmSource": "twitter",
-  "utmMedium": "",
-  "utmCampaign": "",
+  "pageUrl": "https://yoursite.com/?utm_source=facebook",
+  "referrer": "https://facebook.com/",
+  "utmSource": "facebook",
+  "utmMedium": "paid_social",
+  "utmCampaign": "example-validation",
   "utmContent": "",
-  "timestamp": "2025-06-25T12:00:00.000Z"
+  "utmTerm": "",
+  "timeOnPageSeconds": 42,
+  "mockupInteracted": true,
+  "timestamp": "2026-06-29T12:00:42.000Z"
 }
 ```
 
-### Email Signup
-
-```json
-{
-  "eventType": "email_signup",
-  "appId": "example-app",
-  "appName": "Example App",
-  "email": "user@example.com",
-  "price": "",
-  "pageUrl": "https://yoursite.com/",
-  "utmSource": "",
-  "utmMedium": "",
-  "utmCampaign": "",
-  "utmContent": "",
-  "timestamp": "2025-06-25T12:00:00.000Z"
-}
-```
-
-UTM parameters are read automatically from the page URL.
+UTM parameters and `referrer` are captured automatically from the browser.
 
 ## n8n Automation
 
@@ -179,8 +194,7 @@ n8n should replace these files per app idea:
 1. **`app-data/app-config.json`** — full config with copy, theme, pricing, webhooks
 2. **`app-data/images/`** — 1–4 screenshot PNGs
 3. **`mockup.embedUrl`** — URL of the deployed mockup app
-4. **`tracking.buyNowWebhookUrl`** — n8n webhook for purchase intent
-5. **`tracking.emailWebhookUrl`** — n8n webhook for email signups
+4. **`tracking.webhookUrl`** — unified n8n webhook (preferred), or legacy `buyNowWebhookUrl` / `emailWebhookUrl`
 
 After replacement, redeploy to Vercel (or run locally). No code changes needed.
 

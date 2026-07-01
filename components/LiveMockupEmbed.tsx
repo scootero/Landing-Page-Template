@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Smartphone, X, Maximize2 } from "lucide-react";
 import type { MockupConfig } from "@/lib/appData";
+import { useTracking } from "./TrackingProvider";
+import { TRACKING_EVENTS } from "@/lib/tracking";
 
 interface LiveMockupEmbedProps {
   mockup: MockupConfig;
@@ -156,9 +158,11 @@ function unlockPageScroll(scrollY: number) {
 }
 
 export default function LiveMockupEmbed({ mockup, onFocusChange }: LiveMockupEmbedProps) {
+  const { trackEvent, markMockupInteracted } = useTracking();
   const containerRef = useRef<HTMLDivElement>(null);
   const focusAreaRef = useRef<HTMLDivElement>(null);
   const scrollLockRef = useRef(0);
+  const mockupEventSentRef = useRef(false);
   const [focused, setFocused] = useState(false);
   const [focusScale, setFocusScale] = useState(1);
   const [mounted, setMounted] = useState(false);
@@ -182,9 +186,14 @@ export default function LiveMockupEmbed({ mockup, onFocusChange }: LiveMockupEmb
   }, [baseWidth, baseHeight, clipBottomPx]);
 
   const openFocus = useCallback(() => {
+    if (!mockupEventSentRef.current) {
+      mockupEventSentRef.current = true;
+      markMockupInteracted();
+      void trackEvent({ eventType: TRACKING_EVENTS.MOCKUP_INTERACTED });
+    }
     setFocused(true);
     onFocusChange?.(true);
-  }, [onFocusChange]);
+  }, [markMockupInteracted, onFocusChange, trackEvent]);
 
   const closeFocus = useCallback(() => {
     setFocused(false);

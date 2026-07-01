@@ -90,8 +90,18 @@ export interface TestimonialsConfig {
 }
 
 export interface TrackingConfig {
+  /** Unified n8n webhook for all events; overrides legacy URLs when set. */
+  webhookUrl: string;
   buyNowWebhookUrl: string;
   emailWebhookUrl: string;
+  experimentId: string;
+  experimentRunId: string;
+  projectId: string;
+  landingVersion: string;
+  landingVariantId: string;
+  mockupVersionId: string;
+  deploymentId: string;
+  campaignName: string;
 }
 
 export interface SeoConfig {
@@ -142,7 +152,7 @@ const defaults: AppConfig = {
   heroSubheadline: "",
   heroBody: "",
   badgeText: "",
-  primaryCtaText: "Get It Now",
+  primaryCtaText: "Buy Now",
   secondaryCtaText: "Learn More",
   theme: { style: "liquid-glass", accentColor: "violet", mode: "light" },
   logo: { text: "A", imageUrl: "" },
@@ -165,7 +175,7 @@ const defaults: AppConfig = {
     headlineLabel: "Get for",
     price: "",
     billingLabel: "",
-    ctaText: "Buy it now on the App Store",
+    ctaText: "Buy Now on the App Store",
     finePrint: "",
   },
   emailCapture: {
@@ -173,13 +183,25 @@ const defaults: AppConfig = {
     headline: "",
     subheadline: "",
     placeholder: "Enter your email",
-    buttonText: "Notify Me",
+    buttonText: "Keep Me Updated",
   },
   faq: { enabled: false, items: [] },
   testimonials: { enabled: false, items: [] },
   seo: { title: "", description: "", keywords: [], ogImageUrl: "" },
   footer: { text: "" },
-  tracking: { buyNowWebhookUrl: "", emailWebhookUrl: "" },
+  tracking: {
+    webhookUrl: "",
+    buyNowWebhookUrl: "",
+    emailWebhookUrl: "",
+    experimentId: "",
+    experimentRunId: "",
+    projectId: "",
+    landingVersion: "",
+    landingVariantId: "",
+    mockupVersionId: "",
+    deploymentId: "",
+    campaignName: "",
+  },
 };
 
 function mergeConfig(partial: Partial<AppConfig>): AppConfig {

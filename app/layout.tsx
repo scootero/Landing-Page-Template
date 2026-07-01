@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ThemeProvider from "@/components/ThemeProvider";
+import TrackingProvider from "@/components/TrackingProvider";
 import { getAppConfig } from "@/lib/appData";
 import { resolveTheme } from "@/lib/themes";
 import "./globals.css";
@@ -48,7 +49,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        <ThemeProvider theme={resolvedTheme}>{children}</ThemeProvider>
+        <ThemeProvider theme={resolvedTheme}>
+          <TrackingProvider
+            appId={config.appId}
+            appName={config.appName}
+            tracking={config.tracking}
+          >
+            {children}
+          </TrackingProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

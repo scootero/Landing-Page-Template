@@ -67,9 +67,18 @@ npm run dev
 | `landingPage.seo` | `seo.title`, `seo.description`, `seo.keywords` |
 | `media.ogImage.path` (when file exists) | `seo.ogImageUrl` |
 | `mockup.baseWidth`, `baseHeight`, `clipBottomPx` | `mockup.*` |
-| `deployment.mockupUrl` or `mockup.previewUrl` | `mockup.embedUrl` |
-| `tracking.webhooks.emailCaptured` | `tracking.emailWebhookUrl` |
-| `tracking.webhooks.buyNowClicked` | `tracking.buyNowWebhookUrl` |
+| `deployment.mockup.url` or `mockup.previewUrl` (legacy: `deployment.mockupUrl`) | `mockup.embedUrl` |
+| `tracking.webhookUrl` | `tracking.webhookUrl` |
+| `tracking.webhooks.emailCaptured` | `tracking.emailWebhookUrl` (legacy fallback) |
+| `tracking.webhooks.buyNowClicked` | `tracking.buyNowWebhookUrl` (legacy fallback) |
+| `analytics.experimentId` | `tracking.experimentId` |
+| `analytics.experimentRunId` | `tracking.experimentRunId` |
+| `analytics.projectId` | `tracking.projectId` |
+| `analytics.landingVariantId` | `tracking.landingVariantId` |
+| `analytics.mockupVersionId` | `tracking.mockupVersionId` |
+| `deployment.landing.lastDeployedAt` (legacy: `deployment.lastDeployedAt`) | `tracking.landingVersion` |
+| `deployment.landing.vercelProjectId` or `deploymentUrl` (legacy flat fields) | `tracking.deploymentId` |
+| `ads.campaignName` | `tracking.campaignName` |
 
 ## Generic transform fallbacks (not app-specific)
 
@@ -82,12 +91,34 @@ Used only when the package omits the field:
 | `theme.accentColor` | Hex → name map, then `"violet"` |
 | `mockup.baseWidth` / `baseHeight` | `375` / `820` |
 | `mockup.clipBottomPx` | `0` |
+| `primaryCtaText` | `"Buy Now"` |
+| `pricing.ctaText` | `"Buy Now on the App Store"` |
 | `emailCapture.placeholder` | `"Enter your email"` |
-| `emailCapture.buttonText` | `"Notify Me"` |
+| `emailCapture.buttonText` | `"Keep Me Updated"` |
+| `emailCapture.subheadline` | `"Get launch updates."` |
 | `pricing.headlineLabel` | `"Get for"` |
 | `logo.text` | First letter of `appName` |
 | `howItWorks` | `{ enabled: false, steps: [] }` |
 | `benefits` | `[]` when `copy/benefits.md` missing |
+
+## Client-side tracking events
+
+The landing template sends JSON POST payloads to n8n webhooks. Stable `eventType` values:
+
+| eventType | Trigger |
+|-----------|---------|
+| `page_view` | Once on page load |
+| `buy_now_clicked` | Pricing fake-door form submit |
+| `email_captured` | Waitlist / Keep Me Updated form submit |
+| `mockup_interacted` | First expand or click on live mockup preview |
+
+**Webhook routing:** When `tracking.webhookUrl` is set in `app-config.json`, all events use that unified URL. Otherwise `buy_now_clicked` → `buyNowWebhookUrl`, `email_captured` → `emailWebhookUrl`, and passive events fall back to the first configured legacy URL. Empty URLs log to the console in development and do not block the UI.
+
+**Future n8n workflow:** Receive the webhook body and append one row to a unified Google Sheet. Differentiate rows by `eventType`. Recommended column order:
+
+`timestamp | eventType | appId | appName | experimentId | experimentRunId | projectId | deploymentId | landingVersion | landingVariantId | mockupVersionId | campaignName | visitorId | sessionId | email | price | pageUrl | referrer | utmSource | utmMedium | utmCampaign | utmContent | utmTerm | timeOnPageSeconds | mockupInteracted`
+
+`visitorId` and `sessionId` are generated client-side (localStorage / sessionStorage) and are not stored in `app-config.json`.
 
 ## Not mapped (remaining gaps)
 
@@ -105,8 +136,8 @@ Used only when the package omits the field:
 1. Read App Package from Drive
 2. Run equivalent transform → write `app-config.json`
 3. Copy `media/screenshots/*`, logo, and og-image into landing repo `app-data/images/`
-4. After mockup deploy, set `mockup.embedUrl` from `deployment.mockupUrl`
-5. After webhook provisioning, set `tracking.*WebhookUrl` from `tracking.webhooks.*`
+4. After mockup deploy, set `mockup.embedUrl` from `deployment.mockup.url`
+5. After webhook provisioning, set `tracking.webhookUrl` (unified) or `tracking.*WebhookUrl` from `tracking.webhooks.*`
 6. Deploy landing-template to Vercel
 
 The landing page **never** imports mockup source—only `mockup.embedUrl`.

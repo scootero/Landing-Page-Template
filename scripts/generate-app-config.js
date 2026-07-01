@@ -118,7 +118,7 @@ function formatPrice(pricing) {
 }
 
 function formatBuyNowCta(cta, price) {
-  const base = cta?.buyNowText ?? "Buy it now on the App Store";
+  const base = cta?.buyNowText ?? "Buy Now on the App Store";
   if (!price) return base;
   if (base.includes("{price}")) {
     return base.replace(/\{price\}/g, price);
@@ -194,6 +194,40 @@ function mapFooter(app) {
   };
 }
 
+/** Map App Package tracking, analytics, deployment, and ads into landing tracking config. */
+function resolveMockupUrl(app) {
+  const deployment = app.deployment ?? {};
+  return (
+    deployment.mockup?.url ??
+    deployment.mockupUrl ??
+    app.mockup?.previewUrl ??
+    ""
+  );
+}
+
+function mapTracking(app) {
+  const deployment = app.deployment ?? {};
+  const landing = deployment.landing ?? {};
+  return {
+    webhookUrl: app.tracking?.webhookUrl ?? "",
+    buyNowWebhookUrl: app.tracking?.webhooks?.buyNowClicked ?? "",
+    emailWebhookUrl: app.tracking?.webhooks?.emailCaptured ?? "",
+    experimentId: app.analytics?.experimentId ?? "",
+    experimentRunId: app.analytics?.experimentRunId ?? "",
+    projectId: app.analytics?.projectId ?? "",
+    landingVariantId: app.analytics?.landingVariantId ?? "",
+    mockupVersionId: app.analytics?.mockupVersionId ?? "",
+    landingVersion: landing.lastDeployedAt ?? deployment.lastDeployedAt ?? "",
+    deploymentId:
+      landing.vercelProjectId ??
+      landing.deploymentUrl ??
+      deployment.vercelProjectId ??
+      deployment.vercelDeploymentUrl ??
+      "",
+    campaignName: app.ads?.campaignName ?? "",
+  };
+}
+
 function screenshotBasename(packagePath) {
   return path.basename(packagePath);
 }
@@ -241,10 +275,7 @@ function generateAppConfig(app, packageDir) {
   const faqSection = getSection(app, "faq");
   const socialSection = getSection(app, "socialProof");
 
-  const mockupUrl =
-    app.deployment?.mockupUrl ||
-    app.mockup?.previewUrl ||
-    "";
+  const mockupUrl = resolveMockupUrl(app);
 
   const features = parseFeatures(featuresMd);
   const benefits = parseBenefits(benefitsMd);
@@ -272,7 +303,7 @@ function generateAppConfig(app, packageDir) {
     heroSubheadline,
     heroBody: hero.body ?? "",
     badgeText: mapBadgeText(app),
-    primaryCtaText: app.commerce?.cta?.primaryText ?? "Get It Now",
+    primaryCtaText: app.commerce?.cta?.primaryText ?? "Buy Now",
     secondaryCtaText: app.commerce?.cta?.secondaryText ?? "Learn More",
     theme: {
       style: mapLandingStyle(app),
@@ -312,12 +343,12 @@ function generateAppConfig(app, packageDir) {
     emailCapture: {
       enabled: ctaSection?.enabled !== false,
       headline: ctaSection?.inline?.headline ?? "Want launch updates?",
-      subheadline: ctaSection?.inline?.subheadline ?? "Join the waitlist.",
+      subheadline: ctaSection?.inline?.subheadline ?? "Get launch updates.",
       placeholder:
         ctaSection?.inline?.placeholder ??
         app.commerce?.cta?.emailPlaceholder ??
         "Enter your email",
-      buttonText: app.commerce?.cta?.waitlistText ?? "Notify Me",
+      buttonText: app.commerce?.cta?.waitlistText ?? "Keep Me Updated",
     },
     faq: {
       enabled: faqSection?.enabled !== false,
@@ -329,10 +360,7 @@ function generateAppConfig(app, packageDir) {
     },
     seo: mapSeo(app, packageDir, heroSubheadline),
     footer: mapFooter(app),
-    tracking: {
-      buyNowWebhookUrl: app.tracking?.webhooks?.buyNowClicked ?? "",
-      emailWebhookUrl: app.tracking?.webhooks?.emailCaptured ?? "",
-    },
+    tracking: mapTracking(app),
   };
 }
 

@@ -3,26 +3,19 @@
 import { useState } from "react";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import { StoreCtaButton } from "./StoreCta";
+import { useTracking } from "./TrackingProvider";
 import { isValidEmail } from "@/lib/validation";
-import { createTrackingPayload, postTrackingEvent } from "@/lib/tracking";
+import { TRACKING_EVENTS } from "@/lib/tracking";
 
 interface BuyNowTrackerProps {
-  appId: string;
-  appName: string;
   price: string;
   ctaText: string;
-  webhookUrl: string;
 }
 
 type SubmitState = "idle" | "loading" | "success" | "error";
 
-export default function BuyNowTracker({
-  appId,
-  appName,
-  price,
-  ctaText,
-  webhookUrl,
-}: BuyNowTrackerProps) {
+export default function BuyNowTracker({ price, ctaText }: BuyNowTrackerProps) {
+  const { trackEvent } = useTracking();
   const [email, setEmail] = useState("");
   const [state, setState] = useState<SubmitState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -36,15 +29,11 @@ export default function BuyNowTracker({
     setState("loading");
     setErrorMessage("");
 
-    const payload = createTrackingPayload({
-      eventType: "buy_now_click",
-      appId,
-      appName,
+    const result = await trackEvent({
+      eventType: TRACKING_EVENTS.BUY_NOW_CLICKED,
       email: email.trim(),
       price,
     });
-
-    const result = await postTrackingEvent(webhookUrl, payload);
 
     if (result.ok) {
       setState("success");

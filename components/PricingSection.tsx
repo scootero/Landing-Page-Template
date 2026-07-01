@@ -10,18 +10,12 @@ interface PricingSectionProps {
   pricing: PricingConfig;
   benefits: Benefit[];
   features: Feature[];
-  appId: string;
-  appName: string;
-  webhookUrl: string;
 }
 
 export default function PricingSection({
   pricing,
   benefits,
   features,
-  appId,
-  appName,
-  webhookUrl,
 }: PricingSectionProps) {
   if (!pricing.enabled) return null;
 
@@ -76,11 +70,8 @@ export default function PricingSection({
 
             <div className="mt-8">
               <BuyNowTracker
-                appId={appId}
-                appName={appName}
                 price={pricing.price}
                 ctaText={getPricingCtaText(pricing)}
-                webhookUrl={webhookUrl}
               />
             </div>
 

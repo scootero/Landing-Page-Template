@@ -49,16 +49,8 @@ export default function HomePage() {
           pricing={config.pricing}
           benefits={benefits}
           features={features}
-          appId={config.appId}
-          appName={config.appName}
-          webhookUrl={config.tracking.buyNowWebhookUrl}
         />
-        <EmailCapture
-          config={config.emailCapture}
-          appId={config.appId}
-          appName={config.appName}
-          webhookUrl={config.tracking.emailWebhookUrl}
-        />
+        <EmailCapture config={config.emailCapture} />
         {config.faq?.enabled && <FAQSection items={faqItems} />}
         {config.testimonials?.enabled && (
           <TestimonialSection items={testimonials} />
