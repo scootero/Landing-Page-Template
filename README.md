@@ -13,6 +13,7 @@ This template powers **fake-door validation** for iOS app concepts. It presents 
 - Configurable themes and accent colors
 
 All content comes from `app-data/app-config.json`. n8n can replace config, images, and webhook URLs for each new app idea.
+WF2 generates this file from Drive `app.json` plus declared GitHub/URL media assets; the template never reads Drive or `app.json` at runtime.
 
 ## Folder Structure
 
@@ -41,8 +42,9 @@ lib/
   appData.ts          # Config types and loaders
   validation.ts       # Email validation
   tracking.ts         # Webhook payload helpers and event types
-  TrackingProvider.tsx # Client tracking context (page_view, session metrics)
   themes.ts           # Theme system
+components/
+  TrackingProvider.tsx # Client tracking context (page_view, session metrics)
 app-data/
   app-config.json     # All app-specific content
   images/             # Screenshot images (1.png – 4.png)
@@ -66,6 +68,7 @@ All app-specific content lives in `app-data/app-config.json`:
 | `mockup.embedUrl` | Deployed mockup app URL |
 | `pricing`, `emailCapture`, `faq` | Optional sections (`enabled: true/false`) |
 | `tracking` | Webhook URLs and experiment attribution IDs |
+| `seo.metadataBaseUrl` | Generated from `deployment.landing.url` when available; used by Next metadata to resolve relative OG/icon assets |
 
 Set `enabled: false` on optional sections to hide them. Missing arrays or strings won't crash the page.
 
@@ -87,7 +90,7 @@ Set `enabled: false` on optional sections to hide them. Missing arrays or string
 
 ## Replacing Images
 
-1. Drop PNG/JPG files into `app-data/images/` (e.g. `1.png`, `2.png`, `3.png`, `4.png`)
+1. WF2 downloads declared `media.url` / `media.githubPath` assets into `app-data/images/`
 2. Reference them in config: `"image": "/app-data/images/1.png"`
 3. On `npm run dev` or `npm run build`, images are copied to `public/app-data/images/`
 
@@ -187,24 +190,21 @@ All events share the same JSON shape. n8n should append each payload as one row 
 
 UTM parameters and `referrer` are captured automatically from the browser.
 
-## n8n Automation
+## WF2 Automation
 
-n8n should replace these files per app idea:
+WF2 duplicates/seeds this template into a prepared per-app landing repo, generates `app-data/app-config.json`, stages declared media assets in `app-data/images/`, pushes the repo, deploys the prepared Vercel project, and writes `deployment.landing.*` plus `deployment.githubRepoUrl` back to Drive `app.json`.
 
-1. **`app-data/app-config.json`** — full config with copy, theme, pricing, webhooks
-2. **`app-data/images/`** — 1–4 screenshot PNGs
-3. **`mockup.embedUrl`** — URL of the deployed mockup app
-4. **`tracking.webhookUrl`** — unified n8n webhook (preferred), or legacy `buyNowWebhookUrl` / `emailWebhookUrl`
-
-After replacement, redeploy to Vercel (or run locally). No code changes needed.
+No app-specific code changes are needed. Production WF2 reads Drive `app.json` only and resolves media through declared `url`/`githubPath` assets.
 
 ## Deploy to Vercel
 
 1. Push the repo to GitHub
-2. Import the project in [Vercel](https://vercel.com)
+2. Import the project in [Vercel](https://vercel.com), or use the prepared project WF2 deploys
 3. Framework preset: **Next.js**
 4. Build command: `npm run build` (default)
 5. Deploy
+
+For production WF2, the landing project is pushed as the repository root and Vercel Root Directory stays empty/default.
 
 Environment variables are optional. Webhook URLs go in `app-config.json`, not env vars.
 

@@ -117,6 +117,7 @@ export interface SeoConfig {
   description: string;
   keywords: string[];
   ogImageUrl: string;
+  metadataBaseUrl?: string;
 }
 
 export interface FooterConfig {
@@ -197,7 +198,7 @@ const defaults: AppConfig = {
   },
   faq: { enabled: false, items: [] },
   testimonials: { enabled: false, items: [] },
-  seo: { title: "", description: "", keywords: [], ogImageUrl: "" },
+  seo: { title: "", description: "", keywords: [], ogImageUrl: "", metadataBaseUrl: "" },
   footer: { text: "" },
   tracking: {
     webhookUrl: "",

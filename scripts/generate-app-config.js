@@ -406,6 +406,7 @@ function resolveTestimonials(app) {
 
 function mapSeo(app, packageDir, heroSubheadline) {
   const seo = app.landingPage?.seo ?? {};
+  const landingUrl = app.deployment?.landing?.url ?? "";
   const og = resolvePublicImageRef(
     app,
     app.media?.ogImage,
@@ -417,6 +418,7 @@ function mapSeo(app, packageDir, heroSubheadline) {
     title: seo.title ?? "",
     description: seo.description ?? "",
     keywords: seo.keywords ?? [],
+    metadataBaseUrl: landingUrl,
     ogImageUrl: og.missing ? "" : og.image.startsWith("http")
       ? og.image
       : og.image || "",
