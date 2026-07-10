@@ -4,10 +4,17 @@ export interface ThemeConfig {
   style: string;
   accentColor: string;
   mode: string;
+  /** CSS font stack from branding.theme.fontFamily; empty = template default */
+  fontFamily?: string;
 }
 
 export interface LogoConfig {
   text: string;
+  imageUrl: string;
+}
+
+export interface IconConfig {
+  /** Favicon / apple-touch from media.icon */
   imageUrl: string;
 }
 
@@ -86,6 +93,7 @@ export interface TestimonialItem {
 
 export interface TestimonialsConfig {
   enabled: boolean;
+  headline?: string;
   items: TestimonialItem[];
 }
 
@@ -127,6 +135,7 @@ export interface AppConfig {
   secondaryCtaText: string;
   theme: ThemeConfig;
   logo: LogoConfig;
+  icon?: IconConfig;
   mockup: MockupConfig;
   problem: string;
   solution: string;
@@ -154,8 +163,9 @@ const defaults: AppConfig = {
   badgeText: "",
   primaryCtaText: "Buy Now",
   secondaryCtaText: "Learn More",
-  theme: { style: "liquid-glass", accentColor: "violet", mode: "light" },
+  theme: { style: "liquid-glass", accentColor: "violet", mode: "light", fontFamily: "" },
   logo: { text: "A", imageUrl: "" },
+  icon: { imageUrl: "" },
   mockup: {
     embedUrl: "",
     baseWidth: 375,

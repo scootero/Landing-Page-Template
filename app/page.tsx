@@ -53,7 +53,10 @@ export default function HomePage() {
         <EmailCapture config={config.emailCapture} />
         {config.faq?.enabled && <FAQSection items={faqItems} />}
         {config.testimonials?.enabled && (
-          <TestimonialSection items={testimonials} />
+          <TestimonialSection
+            items={testimonials}
+            headline={config.testimonials.headline}
+          />
         )}
       </main>
       <Footer config={config} />

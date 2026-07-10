@@ -5,9 +5,13 @@ import type { TestimonialItem } from "@/lib/appData";
 
 interface TestimonialSectionProps {
   items: TestimonialItem[];
+  headline?: string;
 }
 
-export default function TestimonialSection({ items }: TestimonialSectionProps) {
+export default function TestimonialSection({
+  items,
+  headline,
+}: TestimonialSectionProps) {
   if (!items.length) return null;
 
   return (
@@ -19,7 +23,9 @@ export default function TestimonialSection({ items }: TestimonialSectionProps) {
           viewport={{ once: true }}
           className="mb-12 text-center"
         >
-          <h2 className="section-heading">What people are saying</h2>
+          <h2 className="section-heading">
+            {headline?.trim() || "What people are saying"}
+          </h2>
         </motion.div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

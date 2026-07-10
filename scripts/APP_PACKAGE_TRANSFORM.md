@@ -4,34 +4,66 @@ This document describes how n8n (or `scripts/generate-app-config.js`) maps an [A
 
 The transform **translates package data only** — it must not contain app-specific content.
 
+**Spec 1.5.0:** Production Drive is `app.json` only. Prefer `landingPage.content` + `sections[].inline` and media `url` / `githubPath`. Local `copy/*.md` and `media.path` remain local-dev fallbacks.
+
 ## Run locally
 
 From `landing-template/`:
 
 ```bash
+# Local-dev package (copy/ + media/ on disk)
 node scripts/generate-app-config.js ../test-app-packages/human-lab
+
+# Production-shaped app.json only
+node scripts/generate-app-config.js --app-json /path/to/app.json
+
 npm run dev
 ```
 
-## Input files
+## Input modes
+
+| Mode | Inputs |
+|------|--------|
+| **Production (WF2)** | Drive `app.json` only — inline copy + `url`/`githubPath` media |
+| **Local-dev** | Package directory with `app.json`, optional `copy/*.md`, optional `media/*` files |
+
+## Input files (local-dev)
 
 | App Package path | Used for |
 |------------------|----------|
-| `app.json` | Identity, audience, commerce, branding, media paths, sections, webhooks, deployment URLs |
-| `copy/hero.md` | `heroHeadline`, `heroSubheadline`, `heroBody` |
-| `copy/benefits.md` | `benefits[]` |
-| `copy/features.md` | `features[]` |
-| `copy/faq.md` | `faq.items[]` |
-| `media/screenshots/*.png` | Copied to `app-data/images/`; paths in `screenshots[].image` |
-| `media/logo.png` | Copied to `app-data/images/logo.png` |
-| `media/og-image.png` | Copied to `app-data/images/og-image.png` when present |
+| `app.json` | Identity, audience, commerce, branding, media refs, sections, content, webhooks, deployment URLs |
+| `copy/hero.md` | Fallback when hero is not inline |
+| `copy/benefits.md` | Fallback when `landingPage.content.benefits` missing |
+| `copy/features.md` | Fallback when `landingPage.content.features` missing |
+| `copy/faq.md` | Fallback when `landingPage.content.faq` missing |
+| `media/*` | Local `path` binaries copied to `app-data/images/` |
 
 ## Output
 
 | Output | Purpose |
 |--------|---------|
 | `app-data/app-config.json` | Consumed by `lib/appData.ts` and all landing components |
-| `app-data/images/*` | Copied screenshots, logo, and OG image (when binaries exist) |
+| `app-data/images/*` | Copied screenshots, logo, og-image, icon (when local binaries exist) |
+
+## Content resolution priority
+
+| Output field | Priority |
+|--------------|----------|
+| Hero | `sections[hero].inline` → local `copy/hero.md` → `identity.tagline` fallbacks |
+| Benefits | `landingPage.content.benefits` → local `copy/benefits.md` |
+| Features | `landingPage.content.features` → local `copy/features.md` |
+| FAQ | `landingPage.content.faq` → local `copy/faq.md` |
+| Testimonials | `landingPage.content.testimonials` (no markdown fallback) |
+
+## Media resolution priority
+
+| Asset | Priority |
+|-------|----------|
+| Screenshots / logo / og / icon | local `path` file → `url` → `githubPath` via `assetsGithubRepo ?? mockupGithubRepo` |
+
+Default assets repo: `source.assetsGithubRepo ?? source.mockupGithubRepo` on `source.assetsBranch ?? source.mockupBranch`.
+
+WF2 downloads `githubPath` / `url` binaries into `app-data/images/` before committing the landing repo. Declared asset paths only — never mockup source.
 
 ## Field mapping reference
 
@@ -41,54 +73,49 @@ npm run dev
 | `identity.appName` | `appName` |
 | `identity.tagline` | `tagline` |
 | `identity.badgeText` | `badgeText` |
-| `copy/hero.md` Headline | `heroHeadline` (fallback: `identity.tagline`) |
-| `copy/hero.md` Subheadline | `heroSubheadline` (fallback: truncated `identity.description`) |
-| `copy/hero.md` Body | `heroBody` |
+| `sections[hero].inline` or `copy/hero.md` | `heroHeadline`, `heroSubheadline`, `heroBody` |
 | `commerce.cta.primaryText` | `primaryCtaText` |
 | `commerce.cta.secondaryText` | `secondaryCtaText` |
 | `commerce.cta.buyNowText` | `pricing.ctaText` |
 | `commerce.cta.waitlistText` | `emailCapture.buttonText` |
-| `commerce.cta.emailPlaceholder` or `landingPage.sections[cta].inline.placeholder` | `emailCapture.placeholder` |
+| `commerce.cta.emailPlaceholder` or `sections[cta].inline.placeholder` | `emailCapture.placeholder` |
 | `commerce.pricing` | `pricing.price`, `pricing.billingLabel` |
 | `audience.painPoints[0]` | `problem` |
 | `identity.description` | `solution` |
 | `audience.landingPhrase` | `targetAudience` (fallback: `audience.primary`) |
-| `branding.theme.landingStyle` | `theme.style` (fallback: `midnight` if dark, else `liquid-glass`) |
-| `branding.theme.accentName` | `theme.accentColor` (fallback: hex map, then `violet`) |
+| `branding.theme.landingStyle` | `theme.style` |
+| `branding.theme.accentName` | `theme.accentColor` |
 | `branding.theme.mode` | `theme.mode` |
-| `copy/benefits.md` | `benefits[]` |
-| `copy/features.md` | `features[]` |
+| `branding.theme.fontFamily` | `theme.fontFamily` |
+| `landingPage.content.benefits` | `benefits[]` |
+| `landingPage.content.features` | `features[]` |
+| `landingPage.content.faq` | `faq.items[]` |
+| `landingPage.content.testimonials` | `testimonials.items[]` (`name` → `author`) |
 | `media.screenshots[]` | `screenshots[]` |
+| `media.logo` | `logo.imageUrl` |
+| `media.icon` | `icon.imageUrl` (favicon / apple-touch) |
+| `media.ogImage` | `seo.ogImageUrl` |
 | `landingPage.sections[pricing]` | `pricing.finePrint`, `pricing.enabled` |
-| `landingPage.sections[cta]` | `emailCapture.headline`, `emailCapture.subheadline`, `emailCapture.enabled` |
+| `landingPage.sections[cta]` | `emailCapture.*` |
 | `landingPage.sections[faq]` | `faq.enabled` |
-| `landingPage.sections[socialProof]` | `testimonials.enabled` |
+| `landingPage.sections[socialProof]` | `testimonials.enabled` + optional headline |
 | `landingPage.sections[footer].inline.body` | `footer.text` |
 | `landingPage.seo` | `seo.title`, `seo.description`, `seo.keywords` |
-| `media.ogImage.path` (when file exists) | `seo.ogImageUrl` |
 | `mockup.baseWidth`, `baseHeight`, `clipBottomPx` | `mockup.*` |
-| `deployment.mockup.url` or `mockup.previewUrl` (legacy: `deployment.mockupUrl`) | `mockup.embedUrl` |
-| `tracking.webhookUrl` | `tracking.webhookUrl` |
-| `tracking.webhooks.emailCaptured` | `tracking.emailWebhookUrl` (legacy fallback) |
-| `tracking.webhooks.buyNowClicked` | `tracking.buyNowWebhookUrl` (legacy fallback) |
-| `analytics.experimentId` | `tracking.experimentId` |
-| `analytics.experimentRunId` | `tracking.experimentRunId` |
-| `analytics.projectId` | `tracking.projectId` |
-| `analytics.landingVariantId` | `tracking.landingVariantId` |
-| `analytics.mockupVersionId` | `tracking.mockupVersionId` |
-| `deployment.landing.lastDeployedAt` (legacy: `deployment.lastDeployedAt`) | `tracking.landingVersion` |
-| `deployment.landing.vercelProjectId` or `deploymentUrl` (legacy flat fields) | `tracking.deploymentId` |
+| `deployment.mockup.url` or `mockup.previewUrl` | `mockup.embedUrl` |
+| `tracking.webhookUrl` | `tracking.webhookUrl` (owned by **WF0**) |
+| `analytics.*` | `tracking.experimentId`, etc. |
+| `deployment.landing.lastDeployedAt` | `tracking.landingVersion` |
 | `ads.campaignName` | `tracking.campaignName` |
 
 ## Generic transform fallbacks (not app-specific)
-
-Used only when the package omits the field:
 
 | app-config field | Fallback |
 |------------------|----------|
 | `badgeText` | `"Coming soon to the App Store"` if `platform === "ios"`, else `"Coming soon"` |
 | `theme.style` | `"midnight"` if `mode === "dark"`, else `"liquid-glass"` |
 | `theme.accentColor` | Hex → name map, then `"violet"` |
+| `theme.fontFamily` | `""` (landing uses Geist / CSS default) |
 | `mockup.baseWidth` / `baseHeight` | `375` / `820` |
 | `mockup.clipBottomPx` | `0` |
 | `primaryCtaText` | `"Buy Now"` |
@@ -98,46 +125,14 @@ Used only when the package omits the field:
 | `emailCapture.subheadline` | `"Get launch updates."` |
 | `pricing.headlineLabel` | `"Get for"` |
 | `logo.text` | First letter of `appName` |
-| `howItWorks` | `{ enabled: false, steps: [] }` |
-| `benefits` | `[]` when `copy/benefits.md` missing |
 
-## Client-side tracking events
+## WF2 port notes
 
-The landing template sends JSON POST payloads to n8n webhooks. Stable `eventType` values:
+Port these functions into the n8n Code node:
 
-| eventType | Trigger |
-|-----------|---------|
-| `page_view` | Once on page load |
-| `buy_now_clicked` | Pricing fake-door form submit |
-| `email_captured` | Waitlist / Keep Me Updated form submit |
-| `mockup_interacted` | First expand or click on live mockup preview |
+- `resolveHero`, `resolveBenefits`, `resolveFeatures`, `resolveFaq`, `resolveTestimonials`
+- `resolveGithubAssetUrl`, `resolveAssetsRepo`, `resolvePublicImageRef`
+- `mapTracking`, `mapAccentColor`, `mapLandingStyle`, `mapBadgeText`, `mapSeo`, `mapFooter`
+- `resolveMockupUrl` → `mockup.embedUrl`
 
-**Webhook routing:** When `tracking.webhookUrl` is set in `app-config.json`, all events use that unified URL. Otherwise `buy_now_clicked` → `buyNowWebhookUrl`, `email_captured` → `emailWebhookUrl`, and passive events fall back to the first configured legacy URL. Empty URLs log to the console in development and do not block the UI.
-
-**Future n8n workflow:** Receive the webhook body and append one row to a unified Google Sheet. Differentiate rows by `eventType`. Recommended column order:
-
-`timestamp | eventType | appId | appName | experimentId | experimentRunId | projectId | deploymentId | landingVersion | landingVariantId | mockupVersionId | campaignName | visitorId | sessionId | email | price | pageUrl | referrer | utmSource | utmMedium | utmCampaign | utmContent | utmTerm | timeOnPageSeconds | mockupInteracted`
-
-`visitorId` and `sessionId` are generated client-side (localStorage / sessionStorage) and are not stored in `app-config.json`.
-
-## Not mapped (remaining gaps)
-
-| Spec | Landing template |
-|------|-------------------|
-| `tracking.webhooks.validationComplete` | n8n-only |
-| `tracking.webhooks.deployComplete` | n8n-only |
-| `landingPage.sections[socialProof].inline` | Headline/body not mapped when testimonials enabled |
-| `copy/how-it-works.md` | No parser yet; `howItWorks` stays disabled |
-| `copy/testimonials.md` | No parser yet; `testimonials.items` stays empty |
-| `branding.theme.fontFamily` | Not applied in landing CSS yet |
-
-## n8n workflow (future)
-
-1. Read App Package from Drive
-2. Run equivalent transform → write `app-config.json`
-3. Copy `media/screenshots/*`, logo, and og-image into landing repo `app-data/images/`
-4. After mockup deploy, set `mockup.embedUrl` from `deployment.mockup.url`
-5. After webhook provisioning, set `tracking.webhookUrl` (unified) or `tracking.*WebhookUrl` from `tracking.webhooks.*`
-6. Deploy landing-template to Vercel
-
-The landing page **never** imports mockup source—only `mockup.embedUrl`.
+Do **not** download Drive `copy/` or Drive `media/` folders.

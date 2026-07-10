@@ -27,6 +27,12 @@ export const metadata: Metadata = {
   title: pageTitle,
   description: pageDescription,
   keywords: config.seo.keywords.length ? config.seo.keywords : undefined,
+  icons: config.icon?.imageUrl
+    ? {
+        icon: config.icon.imageUrl,
+        apple: config.icon.imageUrl,
+      }
+    : undefined,
   openGraph: {
     title: pageTitle,
     description: pageDescription,
@@ -39,6 +45,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const fontFamily = config.theme.fontFamily?.trim();
+  const bodyStyle = fontFamily
+    ? ({ fontFamily, ["--font-family" as string]: fontFamily } as React.CSSProperties)
+    : undefined;
+
   return (
     <html
       lang="en"
@@ -48,6 +59,7 @@ export default function RootLayout({
     >
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
+        style={bodyStyle}
       >
         <ThemeProvider theme={resolvedTheme}>
           <TrackingProvider

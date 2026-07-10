@@ -16,15 +16,16 @@ const navLinks = [
 ];
 
 export default function Header({ config }: HeaderProps) {
-  const { logo, appName, primaryCtaText } = config;
+  const { logo, icon, appName, primaryCtaText } = config;
+  const brandImageUrl = logo.imageUrl || icon?.imageUrl || "";
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_80%,transparent)] backdrop-blur-xl">
       <div className="section-container flex h-16 items-center justify-between gap-4">
         <a href="#" className="flex items-center gap-3">
-          {logo.imageUrl ? (
+          {brandImageUrl ? (
             <Image
-              src={logo.imageUrl}
+              src={brandImageUrl}
               alt={appName}
               width={36}
               height={36}
